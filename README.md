@@ -13,9 +13,9 @@ $ go get github.com/John-Lin/ovsdbDriver
 ## Example
 ```go
 package main
-import . "github.com/John-Lin/ovsdbDriver"
+import "github.com/John-Lin/ovsdbDriver"
 
-var ovsDriver *OvsDriver
+var ovsDriver *ovsdbDriver.OvsDriver
 
 func main() {
     // Create an OVS bridge
