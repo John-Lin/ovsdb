@@ -30,19 +30,16 @@ type OvsDriver struct {
 func NewOvsDriver(bridgeName string) *OvsDriver {
 	ovsDriver := new(OvsDriver)
 
-	// By default libovsdb connects to 127.0.0.0:6400.
-	// ovs, err := libovsdb.Connect("", 0)
+	// By default libovsdb connects to 127.0.0.1:6400
+	ovs, err := libovsdb.Connect("localhost", 6640)
+	if err != nil {
+		log.Fatal("[Network] Failed to connect to ovsdb")
+	}
 
-	// If you prefer to connect to OVS in a specific location :
-	// ovs, err := libovsdb.Connect("192.168.56.101", 6640)
-
-	// If you prefer to connect over a Unix socket:
-	ovs, err := libovsdb.ConnectUnix("")
-
-	// connect to OVS
-	// ovs, err := libovsdb.Connect("localhost", 6640)
+	// connect over a Unix socket:
+	// ovs, err := libovsdb.ConnectUnix("")
 	// if err != nil {
-	// 	log.Fatal("Failed to connect to ovsdb")
+	// 	log.Fatal("[Unix] Failed to connect to ovsdb")
 	// }
 
 	// Setup state
