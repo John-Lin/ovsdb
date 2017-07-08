@@ -28,7 +28,7 @@ var ovsDriver *ovsdbDriver.OvsDriver
 
 func main() {
     // Create an OVS bridge
-    ovsDriver = ovsdbDriver.NewOvsDriver("ovsbr")
+    ovsDriver = ovsdbDriver.NewOvsDriver("ovsbr", "127.0.0.1", 6640)
     // Add ovsbr as a internal port without vlan tag (0)
     ovsDriver.CreatePort("ovsbr", "internal", 0)
 }
