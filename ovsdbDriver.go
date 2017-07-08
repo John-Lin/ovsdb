@@ -26,21 +26,67 @@ type OvsDriver struct {
 	lock sync.RWMutex
 }
 
+// DefaultAddress is the default IPV4 address that is used for a connection
+const DefaultAddress = "127.0.0.1"
+
+// DefaultPort is the default port used for a connection
+const DefaultPort = 6640
+
 // Create a new OVS driver
-func NewOvsDriver(bridgeName string) *OvsDriver {
+func NewOvsDriver(bridgeName string, ipAddr string, port int) *OvsDriver {
 	ovsDriver := new(OvsDriver)
 
-	// By default libovsdb connects to 127.0.0.1:6400
-	ovs, err := libovsdb.Connect("localhost", 6640)
-	if err != nil {
-		log.Fatal("[Network] Failed to connect to ovsdb")
+	if ipAddr == "" {
+		ipAddr = DefaultAddress
 	}
 
+	if port <= 0 {
+		port = DefaultPort
+	}
+
+	// By default libovsdb connects to 127.0.0.1:6400
+	ovs, err := libovsdb.Connect(ipAddr, port)
+	if err != nil {
+		log.Fatal("Failed to connect to ovsdb")
+	}
+
+	// Setup state
+	ovsDriver.ovsClient = ovs
+	ovsDriver.OvsBridgeName = bridgeName
+	ovsDriver.ovsdbCache = make(map[string]map[string]libovsdb.Row)
+
+	go func() {
+		// Register for notifications
+		ovs.Register(ovsDriver)
+
+		// Populate initial state into cache
+		initial, _ := ovs.MonitorAll("Open_vSwitch", "")
+		ovsDriver.populateCache(*initial)
+	}()
+
+	// HACK: sleep the main thread so that Cache can be populated
+	time.Sleep(1 * time.Second)
+
+	// Create the default bridge instance
+	err = ovsDriver.CreateBridge(ovsDriver.OvsBridgeName)
+	if err != nil {
+		log.Fatalf("Error creating the default bridge. Err: %v", err)
+	}
+
+	// Return the new OVS driver
+	return ovsDriver
+}
+
+// Create a new OVS driver with Unix socket
+func NewOvsDriverWithUnix(bridgeName string) *OvsDriver {
+	ovsDriver := new(OvsDriver)
+	
 	// connect over a Unix socket:
-	// ovs, err := libovsdb.ConnectUnix("")
-	// if err != nil {
-	// 	log.Fatal("[Unix] Failed to connect to ovsdb")
-	// }
+	// deafult socket file path "/var/run/openvswitch/db.sock"
+	ovs, err := libovsdb.ConnectUnix("")
+	if err != nil {
+		log.Fatal("Failed to connect to ovsdb")
+	}
 
 	// Setup state
 	ovsDriver.ovsClient = ovs
