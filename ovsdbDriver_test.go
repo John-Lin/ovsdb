@@ -10,7 +10,7 @@ var ovsDriver *OvsDriver
 
 func TestMain(m *testing.M) {
 	// Connect to OVS
-	ovsDriver = NewOvsDriver("ovsbr10", "127.0.0.1", 6640)
+	ovsDriver = NewOvsDriverWithUnix("ovsbr10")
 }
 
 func TestCreateDeleteBridge(t *testing.T) {
