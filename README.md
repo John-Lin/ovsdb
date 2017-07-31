@@ -2,7 +2,7 @@ ovsdbDriver
 ====
 A libovsdb wrapper for operating [Open vSwitch](http://openvswitch.org/) via Go.
 
-This library is a fork of the ovsdbDriver functionality in [contiv/ofnet](https://github.com/contiv/ofnet).
+This library is a fork of the ovsdbDriver functionality in [contiv/ofnet](https://github.com/contiv/ofnet) and makes modifications for supporting Unix domain socket to conntct OVSDB.
 
 ## Install 
 
