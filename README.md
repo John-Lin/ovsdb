@@ -1,4 +1,4 @@
-ovsdbDriver
+ovsdb
 ====
 A libovsdb wrapper for operating [Open vSwitch](http://openvswitch.org/) via Go.
 
@@ -7,7 +7,7 @@ This library is a fork of the ovsdbDriver functionality in [contiv/ofnet](https:
 ## Install 
 
 ```
-$ go get -u github.com/John-Lin/ovsdbDriver
+$ go get -u github.com/John-Lin/ovsdb
 ```
 
 ## Usage with ovsdb-server
@@ -21,22 +21,22 @@ $ ovs-vsctl set-manager ptcp:6640
 Create bridge should assign IP and TCP port.
 
 ```go
-ovsDriver = ovsdbDriver.NewOvsDriver("ovsbr", "127.0.0.1", 6640)
+ovsDriver = ovsdb.NewOvsDriver("ovsbr", "127.0.0.1", 6640)
 ```
 
 Otherwise, `ovsdb-server` connects to the Unix domain server socket and the default path is `unix:/var/run/openvswitch/db.sock` .
 
 ```go
-ovsDriver = ovsDriver = NewOvsDriverWithUnix("br0")
+ovsDriver = ovsdb.NewOvsDriverWithUnix("br0")
 ```
 
 ## Example
 ```go
 package main
 
-import "github.com/John-Lin/ovsdbDriver"
+import "github.com/John-Lin/ovsdb"
 
-var ovsDriver *ovsdbDriver.OvsDriver
+var ovsDriver *ovsdb.OvsDriver
 
 func main() {
     // Create an OVS bridge to the Unix domain server socket.
