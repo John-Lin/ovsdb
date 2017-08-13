@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 func TestCreateDeleteBridge(t *testing.T) {
 
 	// Test create
-	err := ovsDriver.CreateBridge("ovsbr11")
+	err := ovsDriver.CreateBridge("ovsbr11", "standalone", true)
 	if err != nil {
 		fmt.Printf("Error creating the bridge. Err: %v", err)
 		t.Errorf("Failed to create a bridge")
@@ -49,7 +49,7 @@ func TestCreateDeleteMultipleBridge(t *testing.T) {
 	// Test create
 	for i := 0; i < 10; i++ {
 		brName := "ovsbr2" + fmt.Sprintf("%d", i)
-		err := ovsDriver.CreateBridge(brName)
+		err := ovsDriver.CreateBridge(brName, "standalone", true)
 		if err != nil {
 			fmt.Printf("Error creating the bridge. Err: %v", err)
 			t.Errorf("Failed to create a bridge")
