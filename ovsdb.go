@@ -33,6 +33,12 @@ type OvsDriver struct {
 	// Name of the OVS bridge
 	OvsBridgeName string
 
+	// Controller Failure Settings
+	failMode string
+
+	// Spanning Tree Protocol
+	stpEnable bool
+
 	// OVSDB cache
 	ovsdbCache map[string]map[string]libovsdb.Row
 
@@ -67,6 +73,8 @@ func NewOvsDriver(bridgeName string, ipAddr string, port int) *OvsDriver {
 	// Setup state
 	ovsDriver.ovsClient = ovs
 	ovsDriver.OvsBridgeName = bridgeName
+	ovsDriver.failMode = "standalone"
+	ovsDriver.stpEnable = true
 	ovsDriver.ovsdbCache = make(map[string]map[string]libovsdb.Row)
 
 	go func() {
@@ -82,7 +90,7 @@ func NewOvsDriver(bridgeName string, ipAddr string, port int) *OvsDriver {
 	time.Sleep(1 * time.Second)
 
 	// Create the default bridge instance
-	err = ovsDriver.CreateBridge(ovsDriver.OvsBridgeName)
+	err = ovsDriver.CreateBridge(ovsDriver.OvsBridgeName, ovsDriver.failMode, ovsDriver.stpEnable)
 	if err != nil {
 		log.Fatalf("Error creating the default bridge. Err: %v", err)
 	}
@@ -105,6 +113,8 @@ func NewOvsDriverWithUnix(bridgeName string) *OvsDriver {
 	// Setup state
 	ovsDriver.ovsClient = ovs
 	ovsDriver.OvsBridgeName = bridgeName
+	ovsDriver.failMode = "standalone"
+	ovsDriver.stpEnable = true
 	ovsDriver.ovsdbCache = make(map[string]map[string]libovsdb.Row)
 
 	go func() {
@@ -120,7 +130,7 @@ func NewOvsDriverWithUnix(bridgeName string) *OvsDriver {
 	time.Sleep(1 * time.Second)
 
 	// Create the default bridge instance
-	err = ovsDriver.CreateBridge(ovsDriver.OvsBridgeName)
+	err = ovsDriver.CreateBridge(ovsDriver.OvsBridgeName, ovsDriver.failMode, ovsDriver.stpEnable)
 	if err != nil {
 		log.Fatalf("Error creating the default bridge. Err: %v", err)
 	}
@@ -222,7 +232,7 @@ func (self *OvsDriver) ovsdbTransact(ops []libovsdb.Operation) error {
 }
 
 // **************** OVS driver API ********************
-func (self *OvsDriver) CreateBridge(bridgeName string) error {
+func (self *OvsDriver) CreateBridge(bridgeName string, failMode string, stp bool) error {
 	namedUuidStr := "dummy"
 	protocols := []string{"OpenFlow10", "OpenFlow11", "OpenFlow12", "OpenFlow13"}
 
@@ -237,7 +247,8 @@ func (self *OvsDriver) CreateBridge(bridgeName string) error {
 	bridge := make(map[string]interface{})
 	bridge["name"] = bridgeName
 	bridge["protocols"], _ = libovsdb.NewOvsSet(protocols)
-	// bridge["fail_mode"] = "secure"
+	bridge["fail_mode"] = failMode
+	bridge["stp_enable"] = stp
 	brOp = libovsdb.Operation{
 		Op:       "insert",
 		Table:    "Bridge",
