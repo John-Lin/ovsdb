@@ -516,10 +516,11 @@ func (self *OvsDriver) AddController(ipAddr string, portNo uint16) error {
 	ctrlerUuidStr := fmt.Sprintf("local")
 	ctrlerUuid := []libovsdb.UUID{{GoUuid: ctrlerUuidStr}}
 
+	// This can't check each individual bridge
 	// If controller already exists, nothing to do
-	if self.IsControllerPresent(ipAddr, portNo) {
-		return nil
-	}
+	// if self.IsControllerPresent(ipAddr, portNo) {
+	//	return nil
+	// }
 
 	// insert a row in Controller table
 	controller := make(map[string]interface{})
