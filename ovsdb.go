@@ -101,11 +101,14 @@ func NewOvsDriver(bridgeName string, ipAddr string, port int) *OvsDriver {
 
 // Create a new OVS driver with Unix socket
 func NewOvsDriverWithUnix(bridgeName string) *OvsDriver {
+	var sockPath string
 	ovsDriver := new(OvsDriver)
 
 	// connect over a Unix socket:
+	// Try to grep ovsdb-server socket file path
 	// deafult socket file path "/var/run/openvswitch/db.sock"
-	ovs, err := libovsdb.ConnectUnix("")
+	sockPath = ovsdbUnixPath()
+	ovs, err := libovsdb.ConnectUnix(sockPath)
 	if err != nil {
 		log.Fatal("Failed to connect to ovsdb")
 	}
