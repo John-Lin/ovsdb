@@ -2,16 +2,17 @@ package ovsdb
 
 import (
 	"os/exec"
-	"strings"
+	"regexp"
 )
 
 func ovsdbUnixPath() string {
 	var path string
-	cmd := "ps aux | awk '{print $12}' | grep -Eo unix:.*openvswitch.*sock"
+	var re = regexp.MustCompile(`--remote=punix:(/.*openvswitch.*sock)`)
+	cmd := "pgrep -f -a ovsdb-server"
 	out, _ := exec.Command("sh", "-c", cmd).Output()
 	if len(out) != 0 {
-		m := strings.Split(string(out[:]), "unix:")
-		path = m[len(m)-1]
+		str := string(out[:])
+		path = re.FindStringSubmatch(str)[1]
 	}
 	return path
 }
