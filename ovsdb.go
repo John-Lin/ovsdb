@@ -21,8 +21,8 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/contiv/libovsdb"
+	log "github.com/sirupsen/logrus"
 )
 
 // OVS driver state
