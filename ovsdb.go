@@ -110,7 +110,7 @@ func NewOvsDriverWithUnix(bridgeName string) *OvsDriver {
 	sockPath = ovsdbUnixPath()
 	ovs, err := libovsdb.ConnectUnix(sockPath)
 	if err != nil {
-		log.Fatal("Failed to connect to ovsdb")
+		log.Fatal("Failed to connect to ovsdb", err)
 	}
 
 	// Setup state
