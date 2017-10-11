@@ -21,24 +21,13 @@ import (
 
 var ovsDriver *OvsDriver
 
-func TestMain(m *testing.M) {
-	// Connect to OVS
-	ovsDriver = NewOvsDriverWithUnix("ovsbr10")
-}
-
 func TestCreateDeleteBridge(t *testing.T) {
 
-	// Test create
-	err := ovsDriver.CreateBridge("ovsbr11", "standalone", true)
-	if err != nil {
-		fmt.Printf("Error creating the bridge. Err: %v", err)
-		t.Errorf("Failed to create a bridge")
-	}
-
+	ovsDriver = NewOvsDriverWithUnix("ovsbr10")
 	time.After(100 * time.Millisecond)
 
 	// Test delete
-	err = ovsDriver.DeleteBridge("ovsbr11")
+	err := ovsDriver.DeleteBridge("ovsbr11")
 	if err != nil {
 		fmt.Printf("Error deleting the bridge. Err: %v", err)
 		t.Errorf("Failed to delete a bridge")
@@ -46,22 +35,22 @@ func TestCreateDeleteBridge(t *testing.T) {
 }
 
 func TestCreateDeleteMultipleBridge(t *testing.T) {
+	bridgeSize := 5
 	// Test create
-	for i := 0; i < 10; i++ {
+	ovsDrivers := make([]OvsDriver, 10)
+	for i := 0; i < bridgeSize; i++ {
 		brName := "ovsbr2" + fmt.Sprintf("%d", i)
-		err := ovsDriver.CreateBridge(brName, "standalone", true)
-		if err != nil {
-			fmt.Printf("Error creating the bridge. Err: %v", err)
-			t.Errorf("Failed to create a bridge")
-		}
+		fmt.Println(brName)
+		ovsDrivers[i] = *(NewOvsDriverWithUnix(brName))
 	}
 
 	time.After(100 * time.Millisecond)
 
 	// Test delete
-	for i := 0; i < 10; i++ {
+	for i := 0; i < bridgeSize; i++ {
 		brName := "ovsbr2" + fmt.Sprintf("%d", i)
-		err := ovsDriver.DeleteBridge(brName)
+		fmt.Println(brName)
+		err := (ovsDrivers[i]).DeleteBridge(brName)
 		if err != nil {
 			fmt.Printf("Error deleting the bridge. Err: %v", err)
 			t.Errorf("Failed to delete a bridge")
@@ -69,6 +58,7 @@ func TestCreateDeleteMultipleBridge(t *testing.T) {
 	}
 }
 
+/*
 func TestCreateDeletePort(t *testing.T) {
 	// Create a port
 	err := ovsDriver.CreatePort("port12", "internal", 11)
@@ -120,13 +110,4 @@ func TestAddController(t *testing.T) {
 		t.Errorf("Failed to add controller")
 	}
 }
-
-func TestDelete(t *testing.T) {
-	// Test delete
-	err := ovsDriver.Delete()
-	if err != nil {
-		fmt.Printf("Error deleting the bridge. Err: %v", err)
-		t.Errorf("Failed to delete a bridge")
-	}
-
-}
+*/
