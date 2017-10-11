@@ -1,6 +1,6 @@
 # ovsdb
-[![Build Status](https://api.travis-ci.org/hwchiu/ovsdb.svg?branch=add_travis)](https://travis-ci.org/hwchiu/ovsdb)
-[![codecov](https://codecov.io/gh/hwchiu/ovsdb/branch/add_travis/graph/badge.svg)](https://codecov.io/gh/hwchiu/ovsdb)
+[![Build Status](https://api.travis-ci.org/hwchiu/ovsdb.svg?branch=master)](https://travis-ci.org/hwchiu/ovsdb)
+[![codecov](https://codecov.io/gh/hwchiu/ovsdb/branch/master/graph/badge.svg)](https://codecov.io/gh/hwchiu/ovsdb)
 
 A libovsdb wrapper for operating [Open vSwitch](http://openvswitch.org/) via Go.
 
