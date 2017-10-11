@@ -1,5 +1,7 @@
-ovsdb
-====
+# ovsdb
+[![Build Status](https://api.travis-ci.org/hwchiu/ovsdb.svg?branch=develop)](https://travis-ci.org/hwchiu/tinynet)
+[![codecov](https://codecov.io/gh/hwchiu/ovsdb/branch/add_travis/graph/badge.svg)](https://codecov.io/gh/hwchiu/tinynet)
+
 A libovsdb wrapper for operating [Open vSwitch](http://openvswitch.org/) via Go.
 
 This library is a fork of the ovsdbDriver functionality in [contiv/ofnet](https://github.com/contiv/ofnet) and makes modifications for supporting Unix domain socket to connect OVSDB.
