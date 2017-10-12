@@ -42,7 +42,7 @@ func TestCreateDeleteMultipleBridge(t *testing.T) {
 		ovsDrivers[i] = *(NewOvsDriverWithUnix(brName))
 	}
 
-	time.After(100 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 
 	// Test delete
 	for i := 0; i < bridgeSize; i++ {
