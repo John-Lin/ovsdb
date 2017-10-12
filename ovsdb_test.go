@@ -15,6 +15,7 @@ package ovsdb
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
@@ -24,14 +25,11 @@ var ovsDriver *OvsDriver
 func TestCreateDeleteBridge(t *testing.T) {
 
 	ovsDriver = NewOvsDriverWithUnix("ovsbr10")
-	time.After(100 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 
 	// Test delete
-	err := ovsDriver.DeleteBridge("ovsbr11")
-	if err != nil {
-		fmt.Printf("Error deleting the bridge. Err: %v", err)
-		t.Errorf("Failed to delete a bridge")
-	}
+	err := ovsDriver.DeleteBridge("ovsbr10")
+	assert.NoError(t, err)
 }
 
 func TestCreateDeleteMultipleBridge(t *testing.T) {
@@ -51,63 +49,61 @@ func TestCreateDeleteMultipleBridge(t *testing.T) {
 		brName := "ovsbr2" + fmt.Sprintf("%d", i)
 		fmt.Println(brName)
 		err := (ovsDrivers[i]).DeleteBridge(brName)
-		if err != nil {
-			fmt.Printf("Error deleting the bridge. Err: %v", err)
-			t.Errorf("Failed to delete a bridge")
-		}
+		assert.NoError(t, err)
+
 	}
 }
-
-/*
 func TestCreateDeletePort(t *testing.T) {
+	bridgeName := "ovsbr10"
+	portName := "port10"
+	// Create a Bridge
+	ovsDriver = NewOvsDriverWithUnix(bridgeName)
 	// Create a port
-	err := ovsDriver.CreatePort("port12", "internal", 11)
-	if err != nil {
-		fmt.Printf("Error creating the port. Err: %v", err)
-		t.Errorf("Failed to create a port")
-	}
+	err := ovsDriver.CreatePort(portName, "internal", 11)
+	assert.NoError(t, err)
 
 	// HACK: wait a little so that interface is visible
 	time.Sleep(time.Second * 1)
 
-	ovsDriver.PrintCache()
-
-	if ovsDriver.IsPortNamePresent("port12") {
-		fmt.Printf("Interface exists\n")
-	} else {
-		fmt.Printf("Interface does not exist\n")
-	}
-
+	exist := ovsDriver.IsPortNamePresent(portName)
+	assert.True(t, exist)
 	// Delete port
-	err = ovsDriver.DeletePort("port12")
-	if err != nil {
-		fmt.Printf("Error Deleting the port. Err: %v", err)
-		t.Errorf("Failed to delete a port")
-	}
+	err = ovsDriver.DeletePort(portName)
+	assert.NoError(t, err)
+
+	err = ovsDriver.DeleteBridge(bridgeName)
+	assert.NoError(t, err)
 }
 
 func TestCreateVtep(t *testing.T) {
+	bridgeName := "ovsbr10"
+	vethName := "vetp1"
+	vethIP := "10.10.10.10"
+	ovsDriver = NewOvsDriverWithUnix(bridgeName)
 	// Create a port
-	err := ovsDriver.CreateVtep("vtep1", "10.10.10.10")
-	if err != nil {
-		fmt.Printf("Error creating the VTEP. Err: %v", err)
-		t.Errorf("Failed to create a port")
-	}
+	err := ovsDriver.CreateVtep(vethName, vethIP)
+	assert.NoError(t, err)
 
-	time.After(100 * time.Millisecond)
+	time.Sleep(300 * time.Millisecond)
 
-	isPresent, vtepName := ovsDriver.IsVtepPresent("10.10.10.10")
-	if (!isPresent) || (vtepName != "vtep1") {
-		t.Errorf("Unable to find the VTEP. present: %v, name: %s", isPresent, vtepName)
-	}
+	isPresent, vtepName := ovsDriver.IsVtepPresent(vethIP)
+	fmt.Println(isPresent, vtepName)
+	assert.True(t, isPresent)
+	assert.Equal(t, vtepName, vethName)
+
+	err = ovsDriver.DeleteVtep(vethName)
+	assert.NoError(t, err)
+	err = ovsDriver.DeleteBridge(bridgeName)
+	assert.NoError(t, err)
 }
 
 func TestAddController(t *testing.T) {
+	bridgeName := "ovsbr10"
+	ovsDriver = NewOvsDriverWithUnix(bridgeName)
 	// Create a port
 	err := ovsDriver.AddController("127.0.0.1", 6666)
-	if err != nil {
-		fmt.Printf("Error adding controller. Err: %v", err)
-		t.Errorf("Failed to add controller")
-	}
+	assert.NoError(t, err)
+	err = ovsDriver.DeleteBridge(bridgeName)
+	assert.NoError(t, err)
+
 }
-*/
