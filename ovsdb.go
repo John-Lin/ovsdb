@@ -74,6 +74,7 @@ func NewOvsDriver(bridgeName string, ipAddr string, port int) *OvsDriver {
 	ovsDriver.ovsClient = ovs
 	ovsDriver.OvsBridgeName = bridgeName
 	ovsDriver.failMode = "standalone"
+	// stpEnable should be stay in false because internal port not being set
 	ovsDriver.stpEnable = false
 	ovsDriver.ovsdbCache = make(map[string]map[string]libovsdb.Row)
 
@@ -117,6 +118,7 @@ func NewOvsDriverWithUnix(bridgeName string) *OvsDriver {
 	ovsDriver.ovsClient = ovs
 	ovsDriver.OvsBridgeName = bridgeName
 	ovsDriver.failMode = "standalone"
+	// stpEnable should be stay in false because internal port not being set
 	ovsDriver.stpEnable = false
 	ovsDriver.ovsdbCache = make(map[string]map[string]libovsdb.Row)
 
