@@ -79,6 +79,7 @@ func TestCreateVtep(t *testing.T) {
 	bridgeName := "ovsbr10"
 	vethName := "vetp1"
 	vethIP := "10.10.10.10"
+	unknownIP := "1.2.3.4"
 	ovsDriver = NewOvsDriverWithUnix(bridgeName)
 	// Create a port
 	err := ovsDriver.CreateVtep(vethName, vethIP)
@@ -87,9 +88,12 @@ func TestCreateVtep(t *testing.T) {
 	time.Sleep(300 * time.Millisecond)
 
 	isPresent, vtepName := ovsDriver.IsVtepPresent(vethIP)
-	fmt.Println(isPresent, vtepName)
 	assert.True(t, isPresent)
 	assert.Equal(t, vtepName, vethName)
+
+	isPresent, vtepName = ovsDriver.IsVtepPresent(unknownIP)
+	assert.False(t, isPresent)
+	assert.Equal(t, vtepName, "")
 
 	err = ovsDriver.DeleteVtep(vethName)
 	assert.NoError(t, err)
@@ -105,5 +109,4 @@ func TestAddController(t *testing.T) {
 	assert.NoError(t, err)
 	err = ovsDriver.DeleteBridge(bridgeName)
 	assert.NoError(t, err)
-
 }
