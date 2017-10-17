@@ -38,7 +38,6 @@ func TestCreateDeleteMultipleBridge(t *testing.T) {
 	ovsDrivers := make([]OvsDriver, 10)
 	for i := 0; i < bridgeSize; i++ {
 		brName := "ovsbr2" + fmt.Sprintf("%d", i)
-		fmt.Println(brName)
 		ovsDrivers[i] = *(NewOvsDriverWithUnix(brName))
 	}
 
@@ -47,7 +46,6 @@ func TestCreateDeleteMultipleBridge(t *testing.T) {
 	// Test delete
 	for i := 0; i < bridgeSize; i++ {
 		brName := "ovsbr2" + fmt.Sprintf("%d", i)
-		fmt.Println(brName)
 		err := (ovsDrivers[i]).DeleteBridge(brName)
 		assert.NoError(t, err)
 
@@ -107,6 +105,12 @@ func TestAddController(t *testing.T) {
 	// Create a port
 	err := ovsDriver.AddController("127.0.0.1", 6666)
 	assert.NoError(t, err)
+	// HACK: wait a little so that interface is visible
+	time.Sleep(time.Second * 1)
+	exist := ovsDriver.IsControllerPresent("127.0.0.1", 6666)
+	assert.True(t, exist)
+	exist = ovsDriver.IsControllerPresent("127.0.0.1", 5555)
+	assert.False(t, exist)
 	err = ovsDriver.DeleteBridge(bridgeName)
 	assert.NoError(t, err)
 }
