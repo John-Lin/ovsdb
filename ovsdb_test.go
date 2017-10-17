@@ -23,12 +23,18 @@ import (
 var ovsDriver *OvsDriver
 
 func TestCreateDeleteBridge(t *testing.T) {
+	bridgeName := "br100"
 
-	ovsDriver = NewOvsDriverWithUnix("ovsbr10")
+	ovsDriver = NewOvsDriverWithUnix(bridgeName)
 	time.Sleep(300 * time.Millisecond)
 
+	exist := ovsDriver.IsBridgePresent(bridgeName)
+	assert.True(t, exist)
+	exist = ovsDriver.IsBridgePresent(bridgeName + "111")
+	assert.False(t, exist)
+
 	// Test delete
-	err := ovsDriver.DeleteBridge("ovsbr10")
+	err := ovsDriver.DeleteBridge(bridgeName)
 	assert.NoError(t, err)
 }
 
