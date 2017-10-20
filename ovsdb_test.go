@@ -23,12 +23,18 @@ import (
 var ovsDriver *OvsDriver
 
 func TestCreateDeleteBridge(t *testing.T) {
+	bridgeName := "br100"
 
-	ovsDriver = NewOvsDriverWithUnix("ovsbr10")
+	ovsDriver = NewOvsDriverWithUnix(bridgeName)
 	time.Sleep(300 * time.Millisecond)
 
+	exist := ovsDriver.IsBridgePresent(bridgeName)
+	assert.True(t, exist)
+	exist = ovsDriver.IsBridgePresent(bridgeName + "111")
+	assert.False(t, exist)
+
 	// Test delete
-	err := ovsDriver.DeleteBridge("ovsbr10")
+	err := ovsDriver.DeleteBridge(bridgeName)
 	assert.NoError(t, err)
 }
 
@@ -38,7 +44,6 @@ func TestCreateDeleteMultipleBridge(t *testing.T) {
 	ovsDrivers := make([]OvsDriver, 10)
 	for i := 0; i < bridgeSize; i++ {
 		brName := "ovsbr2" + fmt.Sprintf("%d", i)
-		fmt.Println(brName)
 		ovsDrivers[i] = *(NewOvsDriverWithUnix(brName))
 	}
 
@@ -47,7 +52,6 @@ func TestCreateDeleteMultipleBridge(t *testing.T) {
 	// Test delete
 	for i := 0; i < bridgeSize; i++ {
 		brName := "ovsbr2" + fmt.Sprintf("%d", i)
-		fmt.Println(brName)
 		err := (ovsDrivers[i]).DeleteBridge(brName)
 		assert.NoError(t, err)
 
@@ -79,6 +83,7 @@ func TestCreateVtep(t *testing.T) {
 	bridgeName := "ovsbr10"
 	vethName := "vetp1"
 	vethIP := "10.10.10.10"
+	unknownIP := "1.2.3.4"
 	ovsDriver = NewOvsDriverWithUnix(bridgeName)
 	// Create a port
 	err := ovsDriver.CreateVtep(vethName, vethIP)
@@ -87,9 +92,12 @@ func TestCreateVtep(t *testing.T) {
 	time.Sleep(300 * time.Millisecond)
 
 	isPresent, vtepName := ovsDriver.IsVtepPresent(vethIP)
-	fmt.Println(isPresent, vtepName)
 	assert.True(t, isPresent)
 	assert.Equal(t, vtepName, vethName)
+
+	isPresent, vtepName = ovsDriver.IsVtepPresent(unknownIP)
+	assert.False(t, isPresent)
+	assert.Equal(t, vtepName, "")
 
 	err = ovsDriver.DeleteVtep(vethName)
 	assert.NoError(t, err)
@@ -103,7 +111,12 @@ func TestAddController(t *testing.T) {
 	// Create a port
 	err := ovsDriver.AddController("127.0.0.1", 6666)
 	assert.NoError(t, err)
+	// HACK: wait a little so that interface is visible
+	time.Sleep(time.Second * 1)
+	exist := ovsDriver.IsControllerPresent("127.0.0.1", 6666)
+	assert.True(t, exist)
+	exist = ovsDriver.IsControllerPresent("127.0.0.1", 5555)
+	assert.False(t, exist)
 	err = ovsDriver.DeleteBridge(bridgeName)
 	assert.NoError(t, err)
-
 }
